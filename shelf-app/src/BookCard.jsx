@@ -1,5 +1,5 @@
 
-export default function BookCard({title, author, pages = 0, rating = 0}) {
+export default function BookCard({title, author, pages, rating}) {
 
     //derived value                                
     const cleanTitle = title.toUpperCase();
