@@ -1,7 +1,9 @@
-import Header from "./components/Header"
-import Footer from "./components/Footer"
-import BookCard from "./components/BookCard"
-import Panel from "./components/Panel"
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import BookCard from "./components/BookCard";
+import Panel from "./components/Panel";
+import Search from "./components/Search";
+import AddBook from "./components/AddBook"
 import { useState } from "react";
 
 const BOOKS = [
@@ -55,50 +57,58 @@ const BOOKS = [
     },
 ];
 
-const currentlyReading = BOOKS.filter(el => el.status === "reading");
-const finishedReading = BOOKS.filter(el => el.status === "finished");
-const wishlist = BOOKS.filter(el => el.status === "want");
-const unstarted = BOOKS.filter(el => el.status === "unstarted");
-
-const booksReading = BOOKS.length === 0 ?
-    <p>No books found</p> :
-    <p>We got books</p>;
-
-let booksWaiting;
-if (BOOKS.length === 0) {
-    booksWaiting = <p>No books to read yet</p>
-} else {
-    booksWaiting = <p>I've got books</p>
-}
-
-// const bookCards = BOOKS.map(book => <BookCard 
-//     title={book.title} 
-//     author={book.author} 
-//     pages={book.pages} 
-//     rating={book.rating} />);
-
-    
-const bookCards = BOOKS.map(book => <BookCard book={book} />);
-
 export default function App() {
   const {books, setBooks} = useState(BOOKS);
+  const {query, setQuery} = useState("");
+
+  function addBook(title) {
+    const book = {
+      id: title,
+      title: title,
+      author: "",
+      status: "reading",
+      pages: 0,
+      tags: []
+    }
+
+    setBooks([...books, book]);
+  }
+
+  const filteredBooks = query ?
+    books.filter(el => el.title.toLowerCase().include(query.toLowerCase())) :
+    books;
+
+  // derived values
+  const currentlyReading = filteredBooks.filter(el => el.status === "reading");
+  const finishedReading = filteredBooks.filter(el => el.status === "finished");
+  const wishlist = filteredBooks.filter(el => el.status === "want");
+  const unstarted = filteredBooks.filter(el => el.status === "unstarted");
 
     return (
         <div className="app">
             <Header />
+            <Search value={query} onQueryChange={setQuery} />
+            <AddBook onAdd={addBook} />
 
             <Panel title="Currently reading">
-                {currentlyReading.length > 0 && currentlyReading.map(book => {
-                    <BookCard key={book.id} book={book} />
-                })}
+                {currentlyReading.length > 0 && 
+                 currentlyReading.map(book => <BookCard key={book.id} book={book} /> )}
+                
             </Panel>
 
             <Panel title="Want to read">
-                {wishlist.length > 0 && wishlist.map(book => <BookCard key={book.id} book={book}/> )}
+                {wishlist.length > 0 && 
+                 wishlist.map(book => <BookCard key={book.id} book={book} /> )}
             </Panel>
 
             <Panel title="Finished reading">
-                {finishedReading.length > 0 && finishedReading.map(book => <BookCard key={book.id} book={book} /> )}
+                {finishedReading.length > 0 && 
+                 finishedReading.map(book => <BookCard key={book.id} book={book} /> )}
+            </Panel>
+
+            <Panel title="Not started">
+              {unstarted.length > 0 && 
+              unstarted.map(book => <BookCard key={book.id} book={book}/> )}
             </Panel>
 
             <Footer></Footer>

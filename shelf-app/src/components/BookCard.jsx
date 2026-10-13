@@ -1,19 +1,19 @@
 
-export default function BookCard({title, author, pages, rating}) {
+export default function BookCard({book}) {
 
     //derived value                                
-    const cleanTitle = title.toUpperCase();
+    const cleanTitle = book.title.toUpperCase();
 
-    const bookRating = rating || 3;
+    const bookRating = book.rating || 3;
 
-    const ratingString = rating > 0 && <p>{"★".repeat(bookRating)}</p>;
+    const ratingString = book.rating > 0 && <p>{"★".repeat(bookRating)}</p>;
 
     return (
         <article className="card">
             <h3 className="card-title">{cleanTitle}</h3>
-            <p className="card-author">{author}</p>
-            <p>Pages: {pages}</p>
-            <p>{ratingString}</p>
+            <p className="card-author">{book.author}</p>
+            <p>Pages: {book.pages}</p>
+            {ratingString}
             <span>Read carefully!</span>
         </article>
     )
