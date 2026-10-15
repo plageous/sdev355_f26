@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Header from "./components/Header"
 import Footer from "./components/Footer"
 import BookCard from "./components/BookCard"
@@ -5,6 +6,15 @@ import Panel from "./components/Panel"
 import Search from "./components/Search"
 import AddForm from './components/AddForm'
 import { useState } from 'react'
+=======
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import BookCard from "./components/BookCard";
+import Panel from "./components/Panel";
+import Search from "./components/Search";
+import AddBook from "./components/AddBook"
+import { useState } from "react";
+>>>>>>> refs/remotes/origin/master
 
 const BOOKS = [
     {
@@ -58,6 +68,7 @@ const BOOKS = [
 ];
 
 export default function App() {
+<<<<<<< HEAD
     const [books, setBooks] = useState(BOOKS);
     const [query, setQuery] = useState("");
 
@@ -84,14 +95,45 @@ export default function App() {
     const finishedReading = filteredBooks.filter(el => el.status === "finished");
     const wishlist = filteredBooks.filter(el => el.status === "want");
     const unstarted = filteredBooks.filter(el => el.status === "unstarted");
+=======
+  const {books, setBooks} = useState(BOOKS);
+  const {query, setQuery} = useState("");
+
+  function addBook(title) {
+    const book = {
+      id: title,
+      title: title,
+      author: "",
+      status: "reading",
+      pages: 0,
+      tags: []
+    }
+
+    setBooks([...books, book]);
+  }
+
+  const filteredBooks = query ?
+    books.filter(el => el.title.toLowerCase().include(query.toLowerCase())) :
+    books;
+
+  // derived values
+  const currentlyReading = filteredBooks.filter(el => el.status === "reading");
+  const finishedReading = filteredBooks.filter(el => el.status === "finished");
+  const wishlist = filteredBooks.filter(el => el.status === "want");
+  const unstarted = filteredBooks.filter(el => el.status === "unstarted");
+>>>>>>> refs/remotes/origin/master
 
     return (
         <div className="app">
             <Header />
             <Search value={query} onQueryChange={setQuery} />
+<<<<<<< HEAD
             <hr />
             <AddForm onAdd={addBook} />
             <hr />
+=======
+            <AddBook onAdd={addBook} />
+>>>>>>> refs/remotes/origin/master
 
             <Panel title="Currently reading">
                 {currentlyReading.length > 0 && 
@@ -107,6 +149,14 @@ export default function App() {
             <Panel title="Finished reading">
                 {finishedReading.length > 0 && 
                  finishedReading.map(book => <BookCard key={book.id} book={book} /> )}
+<<<<<<< HEAD
+=======
+            </Panel>
+
+            <Panel title="Not started">
+              {unstarted.length > 0 && 
+              unstarted.map(book => <BookCard key={book.id} book={book}/> )}
+>>>>>>> refs/remotes/origin/master
             </Panel>
 
             <Footer></Footer>

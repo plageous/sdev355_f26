@@ -5,7 +5,8 @@ export default function BookCard({book}) {
     const cleanTitle = book.title.toUpperCase();
 
     const bookRating = book.rating || 3;
-    const ratingString = bookRating > 0 && <p>{"★".repeat(bookRating)}</p>;
+
+    const ratingString = book.rating > 0 && <p>{"★".repeat(bookRating)}</p>;
 
     return (
         <article className="card">
