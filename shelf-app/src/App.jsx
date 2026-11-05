@@ -1,64 +1,24 @@
-import Header from "./components/Header"
-import Footer from "./components/Footer"
+import Header from "./layout/Header.jsx"
+import Footer from "./layout/Footer.jsx"
 import BookCard from "./components/BookCard"
 import Panel from "./components/Panel"
 import Search from "./components/Search"
 import AddForm from './components/AddForm'
+import BookShelf from "./components/BookShelf"
+import BookDetail from './components/BookDetail'
 import { useState } from 'react'
-
-const BOOKS = [
-    {
-        id: "b1",
-        title: "Red Rising",
-        author: "Pierce Brown",
-        status: "reading",
-        rating: 5,
-        tags: ["sci-fi", "dystopian", "series"],
-    },
-    {
-        id: "b2",
-        title: "The Eye of the World",
-        author: "Robert Jordan",
-        status: "reading",
-        rating: 4,
-        tags: ["fantasy", "epic", "series"],
-    },
-    {
-        id: "b3",
-        title: "Harry Potter and the Prisoner of Azkaban",
-        author: "J.K. Rowling",
-        status: "finished",
-        rating: 5,
-        tags: ["fantasy", "series"],
-    },
-    {
-        id: "b4",
-        title: "The Fellowship of the Ring",
-        author: "J.R.R. Tolkien",
-        status: "want",
-        rating: 0,
-        tags: ["fantasy", "classic", "series"],
-    },
-    {
-        id: "b5",
-        title: "The Hunger Games",
-        author: "Suzanne Collins",
-        status: "finished",
-        rating: 4,
-        tags: ["dystopian", "ya", "series"],
-    },
-    {
-        id: "b6",
-        title: "The Body Keeps The Score",
-        author: "Bessel van der Kolk",
-        status: "unstarted",
-        rating: 5,
-        tags: ["self help", "psychology"],
-    },
-];
+import { useFetch, useDebounce } from './hooks/hooks.js';
 
 export default function App() {
-    const [books, setBooks] = useState(BOOKS);
+    const { 
+        data: books, 
+        setData: setBooks,
+        loading, 
+        error 
+    } = useFetch("http://localhost:4000/api/books?delay=2000", [], []);
+
+    const [reloads, setReloads] = useState(0);
+    const [selectedId, setSelectedId] = useState("b2");
     const [query, setQuery] = useState("");
 
     function addBook(title) {
@@ -75,8 +35,23 @@ export default function App() {
         setBooks([ ...books, book]);
     }
 
-    const filteredBooks = query ? 
-        books.filter(el => el.title.toLowerCase().includes(query.toLowerCase())) : 
+    function cards(title, books) {
+        return (
+            <Panel title={title}>
+                {books.length > 0 && books.map(book => <BookCard key={book.id} book={book} /> )}
+            </Panel>
+        )
+    }
+
+    function handleReload() {
+        console.log("Trying to reload!");
+        setReloads(num => num + 1);
+    }
+
+    //filter on the search value
+    const settled = useDebounce(query, 500);
+    const filteredBooks = settled ? 
+        books.filter(el => el.title.toLowerCase().includes(settled.toLowerCase())) : 
         books;
 
     //derived values
@@ -86,33 +61,24 @@ export default function App() {
     const unstarted = filteredBooks.filter(el => el.status === "unstarted");
 
     return (
-        <div className="app">
-            <Header />
-            <Search value={query} onQueryChange={setQuery} />
+        <>
             <hr />
+            <Search value={query} onQueryChange={setQuery} />
             <AddForm onAdd={addBook} />
             <hr />
+            <button className="reload-button" onClick={handleReload}>Reload Books!</button>
+            <hr />
 
-            <Search value={query} onQueryChange={setQuery} />
-            <AddForm onAdd={handleAddBook} />
+            <BookDetail id={selectedId} />
+            <button className="btn" onClick={() => setSelectedId("b3")}>Read new book!</button>
+            <label>Selected id is {selectedId}</label>
+            <hr />
 
-            <Panel title="Currently reading">
-                {currentlyReading.length > 0 && 
-                 currentlyReading.map(book => <BookCard key={book.id} book={book} /> )}
-                
-            </Panel>
-
-            <Panel title="Want to read">
-                {wishlist.length > 0 && 
-                 wishlist.map(book => <BookCard key={book.id} book={book} /> )}
-            </Panel>
-
-            <Panel title="Finished reading">
-                {finishedReading.length > 0 && 
-                 finishedReading.map(book => <BookCard key={book.id} book={book} /> )}
-            </Panel>
-
-            <Footer></Footer>
-        </div>
+            <BookShelf books={books} error={error} loading={loading}>
+                {cards("Currently reading", currentlyReading)}
+                {cards("Want to read", wishlist)}
+                {cards("Finished reading", finishedReading)}
+            </BookShelf>
+        </>
     )
 }
